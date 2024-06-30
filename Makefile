@@ -12,6 +12,7 @@ endif
 
 .PHONY: install-foundry
 install-foundry:
+	echo "Installing Foundry..."
 	curl -L https://foundry.paradigm.xyz | bash
 	~/.foundry/bin/foundryup --commit $(FOUNDRY_COMMIT)
 
@@ -20,16 +21,19 @@ install-foundry:
 ##
 # Run `make setup-task network=<network> task=<task>`
 setup-task:
+	echo "Setting up task $(task) for network $(network)..."
 	rm -rf $(TEMPLATE_GENERIC)/cache $(TEMPLATE_GENERIC)/lib $(TEMPLATE_GENERIC)/out
 	cp -r $(TEMPLATE_GENERIC) $(PROJECT_DIR)
 
 # Run `make setup-deploy network=<network>`
 setup-deploy:
+	echo "Setting up deploy for network $(network)..."
 	rm -rf $(TEMPLATE_DEPLOY)/cache $(TEMPLATE_DEPLOY)/lib $(TEMPLATE_DEPLOY)/out
 	mkdir -p $(network) && cp -r $(TEMPLATE_DEPLOY) $(DEPLOY_DIR)
 
 # Run `make setup-incident network=<network> incident=<incident-name>`
 setup-incident:
+	echo "Setting up incident $(incident) for network $(network)..."
 	rm -rf $(TEMPLATE_INCIDENT)/cache $(TEMPLATE_INCIDENT)/lib $(TEMPLATE_INCIDENT)/out
 	mkdir -p $(network) && cp -r $(TEMPLATE_INCIDENT) $(INCIDENT_DIR)
 
@@ -41,14 +45,17 @@ deps: install-eip712sign clean-lib forge-deps checkout-op-commit checkout-base-c
 
 .PHONY: install-eip712sign
 install-eip712sign:
+	echo "Installing eip712sign..."
 	go install github.com/base-org/eip712sign@v0.0.6
 
 .PHONY: clean-lib
 clean-lib:
+	echo "Cleaning lib directory..."
 	rm -rf lib
 
 .PHONY: forge-deps
 forge-deps:
+	echo "Installing Forge dependencies..."
 	forge install --no-git github.com/foundry-rs/forge-std \
 		github.com/OpenZeppelin/openzeppelin-contracts@v4.9.3 \
 		github.com/OpenZeppelin/openzeppelin-contracts-upgradeable@v4.7.3 \
@@ -59,6 +66,7 @@ forge-deps:
 .PHONY: checkout-op-commit
 checkout-op-commit:
 	[ -n "$(OP_COMMIT)" ] || (echo "OP_COMMIT must be set in .env" && exit 1)
+	echo "Checking out Optimism commit $(OP_COMMIT)..."
 	rm -rf lib/optimism
 	mkdir -p lib/optimism
 	cd lib/optimism; \
@@ -70,6 +78,7 @@ checkout-op-commit:
 .PHONY: checkout-base-contracts-commit
 checkout-base-contracts-commit:
 	[ -n "$(BASE_CONTRACTS_COMMIT)" ] || (echo "BASE_CONTRACTS_COMMIT must be set in .env" && exit 1)
+	echo "Checking out Base Contracts commit $(BASE_CONTRACTS_COMMIT)..."
 	rm -rf lib/base-contracts
 	mkdir -p lib/base-contracts
 	cd lib/base-contracts; \
@@ -83,4 +92,5 @@ checkout-base-contracts-commit:
 ##
 .PHONY: solidity-test
 solidity-test:
+	echo "Running Solidity tests..."
 	forge test --ffi -vvv
